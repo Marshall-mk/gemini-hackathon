@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["python312", "gcc", "libGL", "glib", "glibc", "libGLU", "pkg-config"]
+nixPkgs = ["python312", "gcc", "libGL", "glib", "glibc", "libGLU", "pkg-config", "xorg.libxcb"]
 
 [phases.install]
 cmds = [
@@ -12,7 +12,8 @@ cmds = [
   "mkdir -p /usr/lib",
   "GL=$(find /nix/store -name 'libGL.so.1' 2>/dev/null | head -n 1) && ln -sf $GL /usr/lib/libGL.so.1 || echo 'libGL link failed'",
   "GLIB=$(find /nix/store -name 'libglib-2.0.so.0' 2>/dev/null | head -n 1) && ln -sf $GLIB /usr/lib/libglib-2.0.so.0 || echo 'glib link failed'",
-  "GTHREAD=$(find /nix/store -name 'libgthread-2.0.so.0' 2>/dev/null | head -n 1) && ln -sf $GTHREAD /usr/lib/libgthread-2.0.so.0 || echo 'gthread link failed'"
+  "GTHREAD=$(find /nix/store -name 'libgthread-2.0.so.0' 2>/dev/null | head -n 1) && ln -sf $GTHREAD /usr/lib/libgthread-2.0.so.0 || echo 'gthread link failed'",
+  "XCB=$(find /nix/store -name 'libxcb.so.1' 2>/dev/null | head -n 1) && ln -sf $XCB /usr/lib/libxcb.so.1 || echo 'libxcb link failed'"
 ]
 
 [start]
