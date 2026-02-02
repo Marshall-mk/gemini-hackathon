@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+python-multipart
+google-genai
+yt-dlp
+pillow
+sqlalchemy
+pydantic
+python-dotenv
+aiohttp
+beautifulsoup4
+reportlab
+requests
+instaloader
+opencv-python
+numpy

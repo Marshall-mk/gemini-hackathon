@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Extractor - AI-Powered Cooking Assistant</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-utensils"></i>
+                <h1>Recipe Extractor</h1>
+            </div>
+            <p class="subtitle">Extract recipes from cooking videos using AI</p>
+        </header>
+
+        <!-- URL Input Section -->
+        <section class="input-section">
+            <div class="input-container">
+                <input
+                    type="text"
+                    id="videoUrl"
+                    placeholder="Paste Instagram or TikTok cooking video URL here..."
+                    class="url-input"
+                >
+                <button id="extractBtn" class="extract-btn">
+                    <i class="fas fa-magic"></i> Extract Recipe
+                </button>
+            </div>
+            <div class="model-selector">
+                <label for="modelSelect">
+                    <i class="fas fa-brain"></i> AI Model:
+                </label>
+                <select id="modelSelect" class="model-select">
+                    <option value="gemini-3-flash-preview">Gemini 3 Flash (Free - 1,000/day)</option>
+                    <option value="gemini-3-pro-preview">Gemini 3 Pro (Paid - Better accuracy)</option>
+                </select>
+            </div>
+            <div class="supported-platforms">
+                <span><i class="fab fa-instagram"></i> Instagram</span>
+                <span><i class="fab fa-tiktok"></i> TikTok</span>
+            </div>
+        </section>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="loading-spinner hidden">
+            <div class="spinner"></div>
+            <p>Analyzing video and extracting recipe...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="error-message hidden"></div>
+
+        <!-- Recipe Display -->
+        <div id="recipeDisplay" class="recipe-display hidden">
+            <!-- Recipe will be dynamically inserted here -->
+        </div>
+
+        <!-- Recipe Gallery -->
+        <section class="gallery-section">
+            <h2><i class="fas fa-images"></i> Your Recipe Collection</h2>
+            <div id="recipeGallery" class="recipe-gallery">
+                <!-- Recipe cards will be dynamically inserted here -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Recipe Detail Modal -->
+    <div id="recipeModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
