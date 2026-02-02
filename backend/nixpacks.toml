@@ -1,8 +1,19 @@
 [phases.setup]
-nixPkgs = ["python312", "gcc", "libGL", "glib", "glibc", "libGLU", "libSM", "pkg-config"]
+nixPkgs = ["python312", "gcc", "libGL", "glib", "glibc", "libGLU", "pkg-config"]
 
 [phases.install]
-cmds = ["pip install -r requirements.txt"]
+cmds = [
+  "python -m venv --copies /opt/venv",
+  ". /opt/venv/bin/activate && pip install -r requirements.txt"
+]
+
+[phases.build]
+cmds = [
+  "mkdir -p /usr/lib",
+  "GL=$(find /nix/store -name 'libGL.so.1' 2>/dev/null | head -n 1) && ln -sf $GL /usr/lib/libGL.so.1 || echo 'libGL link failed'",
+  "GLIB=$(find /nix/store -name 'libglib-2.0.so.0' 2>/dev/null | head -n 1) && ln -sf $GLIB /usr/lib/libglib-2.0.so.0 || echo 'glib link failed'",
+  "GTHREAD=$(find /nix/store -name 'libgthread-2.0.so.0' 2>/dev/null | head -n 1) && ln -sf $GTHREAD /usr/lib/libgthread-2.0.so.0 || echo 'gthread link failed'"
+]
 
 [start]
-cmd = "bash boot.sh"
+cmd = ". /opt/venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port $PORT"

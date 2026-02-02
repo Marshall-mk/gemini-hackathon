@@ -12,5 +12,5 @@ beautifulsoup4
 reportlab
 requests
 instaloader
-opencv-python
+opencv-python-headless
 numpy
