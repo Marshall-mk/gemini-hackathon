@@ -4,7 +4,6 @@ This file deploys the FastAPI app to Modal's serverless platform.
 """
 
 import modal
-from pathlib import Path
 
 # Create Modal app
 app = modal.App("recipe-extractor")
@@ -30,6 +29,7 @@ image = (
         "aiofiles==23.2.1",
     )
     .apt_install("ffmpeg")  # Required for video processing
+    .copy_local_dir("app", "/root/app")  # Copy app directory into image
 )
 
 # Create persistent volumes for temporary storage
@@ -37,18 +37,9 @@ videos_volume = modal.Volume.from_name("recipe-videos", create_if_missing=True)
 images_volume = modal.Volume.from_name("recipe-images", create_if_missing=True)
 exports_volume = modal.Volume.from_name("recipe-exports", create_if_missing=True)
 
-# Mount the app code
-mounts = [
-    modal.Mount.from_local_dir(
-        Path(__file__).parent / "app",
-        remote_path="/root/app"
-    )
-]
-
 
 @app.function(
     image=image,
-    mounts=mounts,
     secrets=[modal.Secret.from_name("gemini-api-key")],
     volumes={
         "/root/data/videos": videos_volume,
@@ -64,7 +55,6 @@ def fastapi_app():
     """
     Deploy FastAPI application to Modal.
     """
-    import os
     from app.main import app as fastapi_app
     from app.database import init_db
 
