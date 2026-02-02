@@ -60,6 +60,23 @@ class VideoDownloader:
             # Last resort: return just the filename with assumed directory
             return f"images/{file_path.name}" if file_path.suffix in ['.jpg', '.png', '.jpeg'] else str(file_path)
 
+    def get_absolute_video_path(self, video_path: Optional[str]) -> Optional[str]:
+        """
+        Convert a public/relative video path to an absolute file system path.
+        Accepts paths like "videos/filename.mp4" or absolute paths.
+        """
+        if not video_path:
+            return None
+
+        if os.path.isabs(video_path):
+            return str(Path(video_path))
+
+        if video_path.startswith("videos/"):
+            return str(self.download_path / video_path.replace("videos/", ""))
+
+        # Fallback: treat as relative to data directory
+        return str((self.data_dir / video_path).resolve())
+
     def detect_platform(self, url: str) -> str:
         """Detect the platform from URL"""
         if "instagram.com" in url or "instagr.am" in url:

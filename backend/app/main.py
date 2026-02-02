@@ -95,11 +95,16 @@ async def extract_recipe(
         # Download video
         platform, video_path, thumbnail_path = video_downloader.download_video(video_url)
 
+        # Resolve absolute video path for Gemini upload
+        video_abs_path = video_downloader.get_absolute_video_path(video_path)
+        if not video_abs_path or not Path(video_abs_path).exists():
+            raise Exception(f"Downloaded video not found at: {video_abs_path}")
+
         # Create GeminiService with selected model
         gemini_service = GeminiService(model_name=selected_model)
 
         # Analyze video with Gemini
-        recipe_data = gemini_service.analyze_video(video_path)
+        recipe_data = gemini_service.analyze_video(video_abs_path)
 
         # Create recipe in database
         db_recipe = models.Recipe(
