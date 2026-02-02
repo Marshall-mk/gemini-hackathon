@@ -7,24 +7,9 @@ import urllib.parse
 class StoreScraper:
     def __init__(self):
         self.stores = {
-            "walmart": {
-                "name": "Walmart",
-                "search_url": "https://www.walmart.com/search?q=",
-                "enabled": True
-            },
             "amazon": {
                 "name": "Amazon Fresh",
                 "search_url": "https://www.amazon.com/s?k=",
-                "enabled": True
-            },
-            "target": {
-                "name": "Target",
-                "search_url": "https://www.target.com/s?searchTerm=",
-                "enabled": True
-            },
-            "instacart": {
-                "name": "Instacart",
-                "search_url": "https://www.instacart.com/store/s?k=",
                 "enabled": True
             }
         }
@@ -66,18 +51,17 @@ class StoreScraper:
 
         return ' '.join(cleaned_words) if cleaned_words else ingredient
 
-    def get_grocery_cart_link(self, ingredients: List[str], store: str = "instacart") -> str:
+    def get_grocery_cart_link(self, ingredients: List[str], store: str = "amazon") -> str:
         """
-        Generate a grocery list link for a specific store
+        Generate a grocery list link for Amazon Fresh
         This creates a search URL with multiple ingredients
         """
         if store not in self.stores:
-            store = "instacart"
+            store = "amazon"
 
         store_info = self.stores[store]
 
-        # For Instacart, we can create a more comprehensive search
-        # For demo purposes, we'll create a general grocery search URL
+        # Create a comprehensive search URL for all ingredients
         all_ingredients = ", ".join(ingredients)
         search_url = store_info["search_url"] + urllib.parse.quote(all_ingredients)
 
@@ -105,12 +89,8 @@ class StoreScraper:
                 "stores": stores
             })
 
-        # Add bulk shopping links
+        # Add bulk shopping link for Amazon Fresh
         ingredient_names = [ing.get("name", "") for ing in ingredients]
-        shopping_list["bulk_shopping_links"] = {
-            "instacart": self.get_grocery_cart_link(ingredient_names, "instacart"),
-            "walmart": self.get_grocery_cart_link(ingredient_names, "walmart"),
-            "amazon": self.get_grocery_cart_link(ingredient_names, "amazon"),
-        }
+        shopping_list["bulk_shopping_link"] = self.get_grocery_cart_link(ingredient_names, "amazon")
 
         return shopping_list

@@ -30,13 +30,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files
-Path("data/images").mkdir(parents=True, exist_ok=True)
-Path("data/exports").mkdir(parents=True, exist_ok=True)
-Path("data/videos").mkdir(parents=True, exist_ok=True)
-app.mount("/images", StaticFiles(directory="data/images"), name="images")
-app.mount("/exports", StaticFiles(directory="data/exports"), name="exports")
-app.mount("/videos", StaticFiles(directory="data/videos"), name="videos")
+# Mount static files (use absolute paths relative to backend)
+BASE_DIR = Path(__file__).resolve().parents[1]
+DATA_DIR = BASE_DIR / "data"
+IMAGES_DIR = DATA_DIR / "images"
+EXPORTS_DIR = DATA_DIR / "exports"
+VIDEOS_DIR = DATA_DIR / "videos"
+
+IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+EXPORTS_DIR.mkdir(parents=True, exist_ok=True)
+VIDEOS_DIR.mkdir(parents=True, exist_ok=True)
+
+app.mount("/images", StaticFiles(directory=str(IMAGES_DIR)), name="images")
+app.mount("/exports", StaticFiles(directory=str(EXPORTS_DIR)), name="exports")
+app.mount("/videos", StaticFiles(directory=str(VIDEOS_DIR)), name="videos")
 
 # Initialize services (GeminiService will be created per request with selected model)
 video_downloader = VideoDownloader()
@@ -147,6 +154,14 @@ async def extract_recipe(
         db.commit()
         db.refresh(db_recipe)
 
+        # Clean up video file after successful extraction (keep only thumbnail)
+        # This saves storage space - we only need the thumbnail and recipe data
+        try:
+            video_downloader.cleanup_video(video_path)
+        except Exception as cleanup_error:
+            # Don't fail the request if cleanup fails
+            print(f"Warning: Failed to cleanup video: {cleanup_error}")
+
         return schemas.RecipeResponse(
             success=True,
             message="Recipe extracted successfully",
@@ -155,6 +170,12 @@ async def extract_recipe(
 
     except Exception as e:
         db.rollback()
+        # Try to cleanup video on failure too
+        try:
+            if 'video_path' in locals():
+                video_downloader.cleanup_video(video_path)
+        except:
+            pass
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -180,14 +201,29 @@ async def get_recipe(recipe_id: int, db: Session = Depends(get_db)):
 
 @app.delete("/api/recipes/{recipe_id}")
 async def delete_recipe(recipe_id: int, db: Session = Depends(get_db)):
-    """Delete a recipe"""
+    """Delete a recipe and its associated files"""
     recipe = db.query(models.Recipe).filter(models.Recipe.id == recipe_id).first()
     if not recipe:
         raise HTTPException(status_code=404, detail="Recipe not found")
 
+    # Clean up files (video and thumbnail) before deleting from database
+    cleanup_result = {"video_deleted": False, "thumbnail_deleted": False}
+    try:
+        cleanup_result = video_downloader.cleanup_recipe_files(
+            recipe.video_path,
+            recipe.thumbnail_path
+        )
+    except Exception as cleanup_error:
+        print(f"Warning: Failed to cleanup files: {cleanup_error}")
+
     db.delete(recipe)
     db.commit()
-    return {"success": True, "message": "Recipe deleted successfully"}
+
+    return {
+        "success": True,
+        "message": "Recipe deleted successfully",
+        "files_cleaned": cleanup_result
+    }
 
 
 @app.get("/api/recipes/{recipe_id}/grocery-list")

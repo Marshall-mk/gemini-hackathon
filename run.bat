@@ -23,8 +23,11 @@ echo Starting FastAPI server...
 echo API will be available at: http://localhost:8000
 echo API documentation: http://localhost:8000/docs
 echo.
-echo Open frontend/index.html in your browser to use the app
+echo Starting new frontend (Vite) in a new window...
 echo.
+
+start "Recipe Extractor Frontend" cmd /k "cd /d ..\frontend && npm install && npm run dev"
+
 echo Press Ctrl+C to stop the server
 echo.
 

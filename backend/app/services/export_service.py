@@ -11,8 +11,10 @@ import os
 
 
 class ExportService:
-    def __init__(self, output_dir: str = "data/exports"):
-        self.output_dir = Path(output_dir)
+    def __init__(self, output_dir: str = None):
+        base_dir = Path(__file__).resolve().parents[2]
+        data_dir = base_dir / "data"
+        self.output_dir = Path(output_dir) if output_dir else data_dir / "exports"
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def export_to_json(self, recipe_data: Dict, recipe_id: int) -> str:
