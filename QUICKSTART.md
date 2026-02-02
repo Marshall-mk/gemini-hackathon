@@ -6,7 +6,7 @@ Get your Recipe Extractor running in 5 minutes!
 
 Your Gemini API key is already configured in `backend/.env.example`:
 ```
-GEMINI_API_KEY=AIzaSyBsV_wBD0RcUxT5o59ZW7CXNnqCD5IBhas
+GEMINI_API_KEY=......
 ```
 
 Copy this file to `.env`:
